@@ -4,25 +4,30 @@ import com.entity.UserEntity;
 import com.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 @RestController
 public class UserController {
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping
     public ResponseEntity<UserEntity> createNewUser(@RequestBody UserEntity newUser) {
+        String hashPassword = passwordEncoder.encode(newUser.getPassword());
+        newUser.setPassword(hashPassword);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(newUser));
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findUserById(id));
     }
@@ -32,7 +37,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("Deleted user with id " + id);
