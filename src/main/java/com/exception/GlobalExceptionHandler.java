@@ -2,6 +2,7 @@ package com.exception;
 
 import com.dto.response.RestResponse;
 import com.exception.custom.NotFoundException;
+import com.exception.custom.UserException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,19 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = {NotFoundException.class})
-    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//    @ExceptionHandler(value = {NotFoundException.class})
+//    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//    }
+
+    @ExceptionHandler(value = {NotFoundException.class,
+            UserException.class})
+    public ResponseEntity<RestResponse<Void>> handleException(Exception e) {
+        RestResponse<Void> response = new RestResponse<>();
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setMessage(e.getMessage());
+        response.setErrorMessage("Exception occured!!!");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(value = {

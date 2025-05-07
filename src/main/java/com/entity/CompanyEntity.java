@@ -42,4 +42,11 @@ public class CompanyEntity {
                 SecurityUtil.getCurrentUserLogin().get() : "";
         this.createdAt = Instant.now();
     }
+
+    @PreUpdate
+    public void handelBeforeUpdate() {
+        this.updatedAt = Instant.now();
+        this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true ?
+                SecurityUtil.getCurrentUserLogin().get() : "";
+    }
 }
